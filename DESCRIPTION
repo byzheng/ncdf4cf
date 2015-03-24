@@ -6,7 +6,7 @@ Type: Package
 Author: Bangyou Zheng
 Description: A Interface to data files written using
     Unidata's netCDF library with CF conventions.
-Version: 0.1.0.4283
+Version: 0.1.0.4544
 Depends:
     ncdf4
 Date: 2013-01-29
