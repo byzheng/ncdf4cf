@@ -1,11 +1,6 @@
 # * Author:    Bangyou Zheng (Bangyou.Zheng@csiro.au)
 # * Created:   9:05 PM Tuesday, 29 January 2013
 # * Copyright: AS IS
-# *
-# * $Revision: 4305 $
-# * $Id: nc.R 4305 2014-08-21 15:11:16Z zhe00a $
-# * $Author: zhe00a $
-# * $Date: 2014-08-22 01:11:16 +1000 (Fri, 22 Aug 2014) $
 
 
 #' @docType package
