@@ -1,12 +1,20 @@
 Package: ncdf4cf
 Maintainer: Bangyou Zheng <Bangyou.Zheng@csiro.au>
-License: AS IS
-Title: Interface to Unidata netCDF with CF conventions
+Title: Interface to Unidata netCDF with CF Conventions
 Type: Package
-Author: Bangyou Zheng
+Authors@R: person("Bangyou", "Zheng", 
+               email = "bangyou.zheng@csiro.au", 
+               role = c("aut", "cre"))
 Description: A Interface to data files written using
     Unidata's netCDF library with CF conventions.
-Version: 0.1.0.4544
-Depends:
-    ncdf4
+Version: 0.1.0
+License: file LICENSE
+URL: https://ncdf4cf.bangyou.me/,
+    https://github.com/byzheng/ncdf4cf
+BugReports: https://github.com/byzheng/ncdf4cf/issues
+Encoding: UTF-8
+Imports: ncdf4
+LazyData: true
+Depends: R (>= 3.5.0)
 Date: 2013-01-29
+RoxygenNote: 7.1.0

@@ -381,11 +381,13 @@ cfvar_get <- function(nc, varname, ...)
             m_value <- ncvar_get(nc, varid = varname, 
                 start = as.numeric(f_start_g[i,]), count = as.numeric(f_len_g[i,]))
             
-            m_idx <- as.matrix(expand.grid(lapply(seq(1, length(f_start)), function(j)
-                {
-                    seq(idx_start_g[i,j], idx_end_g[i,j])
-                })))
-            values[m_idx] <- as.numeric(m_value)
+            args_subset <- list(values)
+            for (j in seq(length = ncol(f_start_g)))
+            {
+                args_subset[[j+1]] <- seq(idx_start_g[i,j], idx_end_g[i,j])
+            }
+            args_subset[[j+2]] <- m_value
+            values <- do.call(`[<-`, args_subset)
         }
     }
     dimnames(values) <- f_dimnames
@@ -398,7 +400,7 @@ cfvar_get <- function(nc, varname, ...)
 #' @param ... variables write into netCDF file
 #' @param filename Name of the netCDF file to be created.
 #' @export
-cfarr_nc <- function(..., filename)
+cfarr_nc <- function(..., filename, prec = 'float')
 {
     variables <- list(...)
     dims <- dimnames(variables[[1]])
@@ -409,7 +411,7 @@ cfarr_nc <- function(..., filename)
         dim_nc[[i]] <- cfdim_def(dim_names[i], '', dims[[i]])
     }
     var_nc <- lapply(names(variables), function(x) 
-        cfvar_def(x, '', dim_nc, compression = 9))
+        cfvar_def(x, '', dim_nc, compression = 9, prec = prec))
     nc <- cf_create(filename, var_nc)
     for (i in seq(along = variables))
     {
