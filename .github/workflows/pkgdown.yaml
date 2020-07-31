@@ -17,6 +17,10 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
 
       - uses: r-lib/actions/setup-tinytex@v1
+      
+      - name: Install netcdf
+        run: apt-get install libnetcdf-dev
+      
 
       - name: Query dependencies
         run: |
