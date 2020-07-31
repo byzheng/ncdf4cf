@@ -1,7 +1,7 @@
-rproject
-========
+# Interface to Unidata netCDF with CF conventions
 
-Interface to Unidata netCDF with CF conventions
+![R-CMD-check](https://github.com/byzheng/ncdf4cf/workflows/R-CMD-check/badge.svg)
+
 -----
 To install:
 
