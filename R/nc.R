@@ -1,6 +1,3 @@
-# * Author:    Bangyou Zheng (Bangyou.Zheng@csiro.au)
-# * Created:   9:05 PM Tuesday, 29 January 2013
-# * Copyright: AS IS
 
 
 #' Opens an existing netCDF file for reading (or, optionally, writing).
@@ -14,6 +11,9 @@ cf_open <- function(filename, write = FALSE)
     ncdf4::nc_open(filename, write)
 }
 
+
+
+
 #' Close a nc file
 #'
 #' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
@@ -22,11 +22,12 @@ cf_close <- function(nc)
 {
     ncdf4::nc_close(nc)
 }
+
 #' Defines a netCDF dimension
 #' @param name Name of the dimension to be created (character string).
 #' @param units The dimension's units (character string).
 #' @param vals The dimension's values (vector of numeric type or string).
-#' If the type is string, a new dimension "str_len" and variable "name_ldl" 
+#' If the type is string, a new dimension "str_len" and variable "name_ldl"
 #' will be created. The "coordinates" attribures will be added to relativly variables
 #' @param ... Other arguments pass to ncdim_def
 #' @export
@@ -57,16 +58,16 @@ cfdim_def <- function(name, units, vals, ...)
 cfvar_def <- function(name, units, dim, ...)
 {
     ncvar <- ncdf4::ncvar_def(name, units, dim, ...)
-    coor <- unlist(lapply(ncvar$dim, function(x) 
+    coor <- unlist(lapply(ncvar$dim, function(x)
+    {
+        if (is.null(x$labels))
         {
-            if (is.null(x$labels))
-            {
-                return(NULL)
-            } else
-            {
-                return (x$name)
-            }
-        }))
+            return(NULL)
+        } else
+        {
+            return (x$name)
+        }
+    }))
     coor <- paste(sprintf('%s_lbl', rev(coor)), collapse = ' ')
     if (nchar(coor) > 0)
     {
@@ -75,7 +76,7 @@ cfvar_def <- function(name, units, dim, ...)
     return(ncvar)
 }
 
-#' Creates a new netCDF file on disk, given the variables the new file is to contain. 
+#' Creates a new netCDF file on disk, given the variables the new file is to contain.
 #'
 #' The "name_lbl" varibles and "coordinates" attribures will be created according the type of dimension.
 #' The global attribure "Conventions" will be created.
@@ -87,58 +88,58 @@ cf_create <- function(filename, vars, ...)
 {
     dims <- unique(unlist(lapply(vars, function(x) x$dim), recursive = FALSE))
     str_len <- max(unlist(lapply(dims, function(x)
+    {
+        if (is.null(x$labels))
         {
-            if (is.null(x$labels))
-            {
-                return (0)
-            } else
-            {
-                return (max(nchar(x$labels)))
-            }
-        })))
+            return (0)
+        } else
+        {
+            return (max(nchar(x$labels)))
+        }
+    })))
     if (str_len > 0)
     {
         str_dim <- ncdf4::ncdim_def('str_len', '', seq(length = str_len),
-            create_dimvar = FALSE)
+                                    create_dimvar = FALSE)
         lbl_vars <- lapply(dims, function(x)
+        {
+            if (is.null(x$labels))
             {
-                if (is.null(x$labels))
-                {
-                    return(NULL)
-                } else
-                {
-                    lbl_var <- ncdf4::ncvar_def(sprintf('%s_lbl', x$name), '',    
-                        list(str_dim, x),
-                        prec = 'char')
-                    return(lbl_var)
-                }
-                
-            })
+                return(NULL)
+            } else
+            {
+                lbl_var <- ncdf4::ncvar_def(sprintf('%s_lbl', x$name), '',
+                                            list(str_dim, x),
+                                            prec = 'char')
+                return(lbl_var)
+            }
+
+        })
         vars <- append(lbl_vars[!unlist(lapply(lbl_vars, is.null))], vars)
     }
     ncnew <- ncdf4::nc_create(filename, vars, ...)
     ncdf4::nc_redef(ncnew)
     temp <- lapply(vars, function(x)
+    {
+        if (!is.null(x$coordinates))
         {
-            if (!is.null(x$coordinates))
-            {
-                ncdf4::ncatt_put(ncnew, x$name, 'coordinates', 
-                    x$coordinates, prec = 'text', definemode = TRUE)
-            }
-        })    
-    ncdf4::ncatt_put(ncnew, 0, 'Conventions', 
-            'CF-1.6', prec = 'text',
-            definemode = TRUE)
+            ncdf4::ncatt_put(ncnew, x$name, 'coordinates',
+                             x$coordinates, prec = 'text', definemode = TRUE)
+        }
+    })
+    ncdf4::ncatt_put(ncnew, 0, 'Conventions',
+                     'CF-1.6', prec = 'text',
+                     definemode = TRUE)
     ncdf4::nc_enddef(ncnew)
-    
+
     temp <- lapply(dims, function(x)
+    {
+        if (!is.null(x$labels))
         {
-            if (!is.null(x$labels))
-            {
-                ncdf4::ncvar_put(ncnew, sprintf('%s_lbl', x$name), 
-                    x$labels)
-            }
-        })    
+            ncdf4::ncvar_put(ncnew, sprintf('%s_lbl', x$name),
+                             x$labels)
+        }
+    })
     return (ncnew)
 }
 
@@ -228,8 +229,8 @@ cfvar_lables <- function(nc, name, dimension = NULL)
             coor_var <- NA
             for (j in seq(along = coordinates))
             {
-                if (dim_name %in% unlist(lapply(nc$var[[coordinates[j]]]$dim, 
-                    function(x) x$name)))
+                if (dim_name %in% unlist(lapply(nc$var[[coordinates[j]]]$dim,
+                                                function(x) x$name)))
                 {
                     coor_var <- coordinates[j]
                     break
@@ -271,20 +272,20 @@ cfvar_get <- function(nc, varname, ...)
     {
         stop(paste(varname, ' does not exist.', sep = ''))
     }
-    
+
     if (nc$var[[varname]]$prec == 'char')
     {
         values <- ncdf4::ncvar_get(nc, varname)
         return (values)
     }
     missing_var <- nc$var[[varname]]$missval
-    
-    
+
+
     factors_name <- names(factors)
     f_start <- as.list(NULL)
     f_len <- as.list(NULL)
     f_dimnames <- as.list(NULL)
-    
+
     splitVector <- function(x, xmin = 1, xmax = 9999999999999999999999999)
     {
         x <- sort(unique(x))
@@ -302,8 +303,8 @@ cfvar_get <- function(nc, varname, ...)
             return(res)
         }
         diff_x <- all_x[!(all_x %in% x)]
-        diff_x <- c(min(x) - 1, diff_x[c(TRUE, 
-            diff_x[-1] - diff_x[-length(diff_x)] > 1)], max(x) + 1)
+        diff_x <- c(min(x) - 1, diff_x[c(TRUE,
+                                         diff_x[-1] - diff_x[-length(diff_x)] > 1)], max(x) + 1)
         all_parts <- as.list(NULL)
         for (i in seq(length = length(diff_x) - 1))
         {
@@ -311,36 +312,36 @@ cfvar_get <- function(nc, varname, ...)
         }
         return(all_parts)
     }
-    
-    
-    
+
+
+
     for (i in seq(length = nc$var[[varname]]$ndims))
     {
         c_dim <- nc$var[[varname]]$dim[[i]]
         dim_name <- c_dim$name
-        
+
         nc_levels <- cfvar_lables(nc, varname, dim_name)[[1]]
         if (dim_name %in% factors_name)
         {
             dim_levels <- factors[[dim_name]]
-            
+
             # Check if the dimension levels with minus symbols
             # minus_dims <- grep('^-', dim_levels)
             # if (length(minus_dims) > 0 & length(minus_dims) != length(dim_levels))
             # {
-                # stop('All dimensions must have "-" symbols')
+            # stop('All dimensions must have "-" symbols')
             # }
             # if (length(minus_dims) > 0)
             # {
-                # dim_levels <- nc_levels[!(nc_levels %in% gsub('^-', '', dim_levels))]
+            # dim_levels <- nc_levels[!(nc_levels %in% gsub('^-', '', dim_levels))]
             # }
-                        
+
             pos <- match(dim_levels, nc_levels)
-            
+
             if (sum(is.na(pos)) > 0)
             {
                 stop(sprintf('Levels "%s" don\'t exist in the dimension "%s"',
-                    paste(dim_levels, collapse = ', '), dim_name))
+                             paste(dim_levels, collapse = ', '), dim_name))
             }
             pos <- splitVector(pos, xmax = c_dim$len)
             f_start[[dim_name]] <- as.numeric(lapply(pos, FUN = function(x) x[1]))
@@ -353,13 +354,13 @@ cfvar_get <- function(nc, varname, ...)
         }
         f_dimnames[[dim_name]] <- as.character(nc_levels)
     }
-    
-    
+
+
     f_start_g <- expand.grid(f_start)
     f_len_g <- expand.grid(f_len)
-    idx_start <- lapply(f_len, function(x) c(1, cumsum(x[-length(x)]) + 1)) 
+    idx_start <- lapply(f_len, function(x) c(1, cumsum(x[-length(x)]) + 1))
     idx_start_g <- expand.grid(idx_start)
-    idx_end <- lapply(f_len, cumsum) 
+    idx_end <- lapply(f_len, cumsum)
     idx_end_g <- expand.grid(idx_end)
     if (is.null(factors))
     {
@@ -370,9 +371,9 @@ cfvar_get <- function(nc, varname, ...)
         values <- array(rep(NA, prod(dim_value)), dim = dim_value)
         for (i in seq(nrow(f_start_g)))
         {
-            m_value <- ncdf4::ncvar_get(nc, varid = varname, 
-                start = as.numeric(f_start_g[i,]), count = as.numeric(f_len_g[i,]))
-            
+            m_value <- ncdf4::ncvar_get(nc, varid = varname,
+                                        start = as.numeric(f_start_g[i,]), count = as.numeric(f_len_g[i,]))
+
             args_subset <- list(values)
             for (j in seq(length = ncol(f_start_g)))
             {
@@ -386,7 +387,7 @@ cfvar_get <- function(nc, varname, ...)
     return(values)
 }
 
-#' Convert an array into a new netCDF file on disk, given the variables the new file is to contain. 
+#' Convert an array into a new netCDF file on disk, given the variables the new file is to contain.
 #'
 #' An array will be convert into a new netCDF with CF convention
 #' @param ... variables write into netCDF file
@@ -403,7 +404,7 @@ cfarr_nc <- function(..., filename, prec = 'float')
     {
         dim_nc[[i]] <- cfdim_def(dim_names[i], '', dims[[i]])
     }
-    var_nc <- lapply(names(variables), function(x) 
+    var_nc <- lapply(names(variables), function(x)
         cfvar_def(x, '', dim_nc, compression = 9, prec = prec))
     nc <- cf_create(filename, var_nc)
     for (i in seq(along = variables))

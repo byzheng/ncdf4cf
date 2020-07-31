@@ -12,7 +12,7 @@ cfdim_def(name, units, vals, ...)
 \item{units}{The dimension's units (character string).}
 
 \item{vals}{The dimension's values (vector of numeric type or string).
-If the type is string, a new dimension "str_len" and variable "name_ldl" 
+If the type is string, a new dimension "str_len" and variable "name_ldl"
 will be created. The "coordinates" attribures will be added to relativly variables}
 
 \item{...}{Other arguments pass to ncdim_def}

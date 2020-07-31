@@ -1,12 +1,11 @@
 Package: ncdf4cf
-Maintainer: Bangyou Zheng <Bangyou.Zheng@csiro.au>
 Title: Interface to Unidata netCDF with CF Conventions
 Type: Package
 Authors@R: person("Bangyou", "Zheng", 
                email = "bangyou.zheng@csiro.au", 
                role = c("aut", "cre"))
-Description: A Interface to data files written using
-    Unidata's netCDF library with CF conventions.
+Description: A Interface to data files written using 
+    Unidata netCDF library with CF conventions.
 Version: 0.1.0
 License: file LICENSE
 URL: https://ncdf4cf.bangyou.me/,

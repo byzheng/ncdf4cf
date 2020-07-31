@@ -6,7 +6,7 @@ name: pkgdown
 
 jobs:
   pkgdown:
-    runs-on: macOS-latest
+    runs-on: windows-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -17,10 +17,6 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
 
       - uses: r-lib/actions/setup-tinytex@v1
-      
-      - name: Install netcdf
-        run: apt-get install libnetcdf-dev
-      
 
       - name: Query dependencies
         run: |
