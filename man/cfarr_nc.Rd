@@ -10,6 +10,8 @@ cfarr_nc(..., filename, prec = "float")
 \item{...}{variables write into netCDF file}
 
 \item{filename}{Name of the netCDF file to be created.}
+
+\item{prec}{Accuracy of dimension}
 }
 \description{
 An array will be convert into a new netCDF with CF convention

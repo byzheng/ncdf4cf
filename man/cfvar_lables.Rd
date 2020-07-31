@@ -10,6 +10,8 @@ cfvar_lables(nc, name, dimension = NULL)
 \item{nc}{An object of class ncdf4 (as returned from nc_open), indicating what file to read from.}
 
 \item{name}{The variable name}
+
+\item{dimension}{Dimension of input variables}
 }
 \description{
 Get labels for all dimensions

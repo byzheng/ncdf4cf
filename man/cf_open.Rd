@@ -9,7 +9,7 @@ cf_open(filename, write = FALSE)
 \arguments{
 \item{filename}{Name of the existing netCDF file to be opened.}
 
-\item{If}{FALSE (default), then the file is opened read-only. If TRUE, then writing to the file is allowed.}
+\item{write}{If FALSE (default), then the file is opened read-only. If TRUE, then writing to the file is allowed.}
 }
 \description{
 Opens an existing netCDF file for reading (or, optionally, writing).

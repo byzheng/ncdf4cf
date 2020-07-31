@@ -3,22 +3,14 @@
 # * Copyright: AS IS
 
 
-#' @docType package
-#' ...
-#' @import ncdf4
-ncdf4cf <- function()
-{
-}
-
-
 #' Opens an existing netCDF file for reading (or, optionally, writing).
 #'
 #' @param filename Name of the existing netCDF file to be opened.
-#' @param If FALSE (default), then the file is opened read-only. If TRUE, then writing to the file is allowed.
+#' @param write If FALSE (default), then the file is opened read-only. If TRUE, then writing to the file is allowed.
 #' @export
 cf_open <- function(filename, write = FALSE)
 {
-    library(ncdf4)
+
     ncdf4::nc_open(filename, write)
 }
 
@@ -50,7 +42,7 @@ cfdim_def <- function(name, units, vals, ...)
         labels <- vals
         vals <- seq(along = vals)
     }
-    new_dim <- ncdim_def(name, units, vals, ...)
+    new_dim <- ncdf4::ncdim_def(name, units, vals, ...)
     new_dim$labels <- labels
     return (new_dim)
 }
@@ -64,7 +56,7 @@ cfdim_def <- function(name, units, vals, ...)
 #' @export
 cfvar_def <- function(name, units, dim, ...)
 {
-    ncvar <- ncvar_def(name, units, dim, ...)
+    ncvar <- ncdf4::ncvar_def(name, units, dim, ...)
     coor <- unlist(lapply(ncvar$dim, function(x) 
         {
             if (is.null(x$labels))
@@ -106,7 +98,7 @@ cf_create <- function(filename, vars, ...)
         })))
     if (str_len > 0)
     {
-        str_dim <- ncdim_def('str_len', '', seq(length = str_len),
+        str_dim <- ncdf4::ncdim_def('str_len', '', seq(length = str_len),
             create_dimvar = FALSE)
         lbl_vars <- lapply(dims, function(x)
             {
@@ -115,7 +107,7 @@ cf_create <- function(filename, vars, ...)
                     return(NULL)
                 } else
                 {
-                    lbl_var <- ncvar_def(sprintf('%s_lbl', x$name), '',    
+                    lbl_var <- ncdf4::ncvar_def(sprintf('%s_lbl', x$name), '',    
                         list(str_dim, x),
                         prec = 'char')
                     return(lbl_var)
@@ -124,26 +116,26 @@ cf_create <- function(filename, vars, ...)
             })
         vars <- append(lbl_vars[!unlist(lapply(lbl_vars, is.null))], vars)
     }
-    ncnew <- nc_create(filename, vars, ...)
-    nc_redef(ncnew)
+    ncnew <- ncdf4::nc_create(filename, vars, ...)
+    ncdf4::nc_redef(ncnew)
     temp <- lapply(vars, function(x)
         {
             if (!is.null(x$coordinates))
             {
-                ncatt_put(ncnew, x$name, 'coordinates', 
+                ncdf4::ncatt_put(ncnew, x$name, 'coordinates', 
                     x$coordinates, prec = 'text', definemode = TRUE)
             }
         })    
-    ncatt_put(ncnew, 0, 'Conventions', 
+    ncdf4::ncatt_put(ncnew, 0, 'Conventions', 
             'CF-1.6', prec = 'text',
             definemode = TRUE)
-    nc_enddef(ncnew)
+    ncdf4::nc_enddef(ncnew)
     
     temp <- lapply(dims, function(x)
         {
             if (!is.null(x$labels))
             {
-                ncvar_put(ncnew, sprintf('%s_lbl', x$name), 
+                ncdf4::ncvar_put(ncnew, sprintf('%s_lbl', x$name), 
                     x$labels)
             }
         })    
@@ -196,7 +188,7 @@ cfvar_lbl <- function(nc, name)
         var_labels <- seq(length = nc$dim[[name]]$len)
     } else
     {
-        var_labels <- ncvar_get(nc, name)
+        var_labels <- ncdf4::ncvar_get(nc, name)
         pos <- nchar(var_labels) == 0
         if (sum(pos) > 0)
         {
@@ -210,6 +202,7 @@ cfvar_lbl <- function(nc, name)
 #' Get labels for all dimensions
 #' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
 #' @param name The variable name
+#' @param dimension Dimension of input variables
 #' @export
 cfvar_lables <- function(nc, name, dimension = NULL)
 {
@@ -217,7 +210,7 @@ cfvar_lables <- function(nc, name, dimension = NULL)
     {
         stop(sprintf('%s doesn\'t exist', name))
     }
-    coordinates <- ncatt_get(nc, name, attname = 'coordinates')
+    coordinates <- ncdf4::ncatt_get(nc, name, attname = 'coordinates')
     if (coordinates$hasatt)
     {
         coordinates <- strsplit(coordinates$value, '+ ')[[1]]
@@ -269,7 +262,6 @@ cfvar_lables <- function(nc, name, dimension = NULL)
 #' @export
 cfvar_get <- function(nc, varname, ...)
 {
-    library(ncdf4)
     factors <- list(...)
     if (length(varname) != 1)
     {
@@ -282,7 +274,7 @@ cfvar_get <- function(nc, varname, ...)
     
     if (nc$var[[varname]]$prec == 'char')
     {
-        values <- ncvar_get(nc, varname)
+        values <- ncdf4::ncvar_get(nc, varname)
         return (values)
     }
     missing_var <- nc$var[[varname]]$missval
@@ -371,14 +363,14 @@ cfvar_get <- function(nc, varname, ...)
     idx_end_g <- expand.grid(idx_end)
     if (is.null(factors))
     {
-        values <- ncvar_get(nc, varid = varname)
+        values <- ncdf4::ncvar_get(nc, varid = varname)
     } else
     {
         dim_value <- as.numeric(unlist(lapply(f_dimnames, length)))
         values <- array(rep(NA, prod(dim_value)), dim = dim_value)
         for (i in seq(nrow(f_start_g)))
         {
-            m_value <- ncvar_get(nc, varid = varname, 
+            m_value <- ncdf4::ncvar_get(nc, varid = varname, 
                 start = as.numeric(f_start_g[i,]), count = as.numeric(f_len_g[i,]))
             
             args_subset <- list(values)
@@ -399,6 +391,7 @@ cfvar_get <- function(nc, varname, ...)
 #' An array will be convert into a new netCDF with CF convention
 #' @param ... variables write into netCDF file
 #' @param filename Name of the netCDF file to be created.
+#' @param prec Accuracy of dimension
 #' @export
 cfarr_nc <- function(..., filename, prec = 'float')
 {
@@ -415,7 +408,7 @@ cfarr_nc <- function(..., filename, prec = 'float')
     nc <- cf_create(filename, var_nc)
     for (i in seq(along = variables))
     {
-        ncvar_put(nc, names(variables)[i], variables[[i]])
+        ncdf4::ncvar_put(nc, names(variables)[i], variables[[i]])
     }
-    nc_close(nc)
+    ncdf4::nc_close(nc)
 }
