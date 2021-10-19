@@ -14,7 +14,10 @@ test_that("Create and read ncdf4", {
     nc <- cf_create(filename = filename, vars = list(var1))
     ncdf4::ncvar_put(nc, 'var1', seq(1, 25))
     cf_close(nc)
+    # reading data
     nc <- cf_open(filename)
     new_data <- cfvar_get(nc, "var1")
     expect_equal(as.vector(unlist(new_data)), seq(1, 25))
+    cf_close(nc)
+    file.remove(filename)
 })
