@@ -4,10 +4,10 @@
 #'
 #' @param filename Name of the existing netCDF file to be opened.
 #' @param write If FALSE (default), then the file is opened read-only. If TRUE, then writing to the file is allowed.
+#' @return A ncdf4 object created by nc_open in ncdf4 package.
 #' @export
 cf_open <- function(filename, write = FALSE)
 {
-
     ncdf4::nc_open(filename, write)
 }
 
@@ -17,6 +17,7 @@ cf_open <- function(filename, write = FALSE)
 #' Close a nc file
 #'
 #' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
+#' @return No return value.
 #' @export
 cf_close <- function(nc)
 {
@@ -30,6 +31,7 @@ cf_close <- function(nc)
 #' If the type is string, a new dimension "str_len" and variable "name_ldl"
 #' will be created. The "coordinates" attribures will be added to relativly variables
 #' @param ... Other arguments pass to ncdim_def
+#' @return An object of class ncdim4 that follow CF Conventions
 #' @export
 cfdim_def <- function(name, units, vals, ...)
 {
@@ -54,6 +56,7 @@ cfdim_def <- function(name, units, vals, ...)
 #' @param units The variable's units (character string).
 #' @param dim The variable's dimension(s)
 #' @param ... Other arguments pass to ncvar_def
+#' @return An object of class ncvar4 that follow CF Conventions
 #' @export
 cfvar_def <- function(name, units, dim, ...)
 {
@@ -83,6 +86,7 @@ cfvar_def <- function(name, units, dim, ...)
 #' @param filename Name of the netCDF file to be created.
 #' @param vars     Either an object of class ncvar4 describing the variable to be created, or a vector (or list) of such objects to be created.
 #' @param ... Other arguments pass to nc_create
+#' @return An object of class ncdf4 that follow CF Conventions
 #' @export
 cf_create <- function(filename, vars, ...)
 {
@@ -147,6 +151,7 @@ cf_create <- function(filename, vars, ...)
 #' Get all variable names from nc file
 #'
 #' @param nc An object of class ncdf4 (as returned from ncOpen), indicating what file to read from.
+#' @return A vector of variable names in the NetCDF file.
 #' @export
 cfvar_names <- function(nc)
 {
@@ -164,6 +169,7 @@ cfvar_names <- function(nc)
 #'
 #' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
 #' @param var The variable name
+#' @return A vector of dimension names.
 #' @export
 cfdim_names <- function(nc, var)
 {
@@ -177,10 +183,10 @@ cfdim_names <- function(nc, var)
 }
 
 
-#' Get all labels for dimension
-#'
-#' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
-#' @param name The dimesion name
+# Get all labels for dimension
+#
+# @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
+# @param name The dimesion name
 cfvar_lbl <- function(nc, name)
 {
     nc_var <- nc$var[[name]]
@@ -204,6 +210,7 @@ cfvar_lbl <- function(nc, name)
 #' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
 #' @param name The variable name
 #' @param dimension Dimension of input variables
+#' @return A vector of all labels for a dimension.
 #' @export
 cfvar_lables <- function(nc, name, dimension = NULL)
 {
@@ -255,11 +262,12 @@ cfvar_lables <- function(nc, name, dimension = NULL)
     return(res)
 }
 
-#' Get varibles values from nc file
+#' Get variables values from nc file
 #'
 #' @param nc An object of class ncdf4 (as returned from nc_open), indicating what file to read from.
 #' @param varname The variables names in the nc file.
 #' @param ... Arguments are used to specify which data will be returned.
+#' @return A named array for data stored in the NetCDF file.
 #' @export
 cfvar_get <- function(nc, varname, ...)
 {
@@ -393,6 +401,7 @@ cfvar_get <- function(nc, varname, ...)
 #' @param ... variables write into netCDF file
 #' @param filename Name of the netCDF file to be created.
 #' @param prec Accuracy of dimension
+#' @return No return values
 #' @export
 cfarr_nc <- function(..., filename, prec = 'float')
 {

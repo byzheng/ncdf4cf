@@ -1,13 +1,14 @@
 Package: ncdf4cf
-Title: Interface to Unidata netCDF with CF Conventions
+Title: Unidata NetCDF with CF Conventions
 Type: Package
 Authors@R: person("Bangyou", "Zheng", 
                email = "bangyou.zheng@csiro.au", 
                role = c("aut", "cre"))
-Description: A Interface to data files written using 
-    Unidata netCDF library with CF conventions.
+Description: The CF metadata conventions are designed to promote 
+    the processing and sharing of files created with the NetCDF. 
+    'ncdf4' is designed to write and read NetCDF file with CF conventions.
 Version: 0.1.0
-License: file LICENSE
+License: MIT + file LICENSE
 URL: https://ncdf4cf.bangyou.me/,
     https://github.com/byzheng/ncdf4cf
 BugReports: https://github.com/byzheng/ncdf4cf/issues
@@ -17,3 +18,6 @@ LazyData: true
 Depends: R (>= 3.5.0)
 Date: 2013-01-29
 RoxygenNote: 7.1.0
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
